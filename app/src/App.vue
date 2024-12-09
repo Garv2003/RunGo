@@ -1,39 +1,44 @@
 <template>
-  <div class="editor">
-    <textarea v-model="code" placeholder="Write Go code here..." />
-    <button @click="runCode">Run</button>
-    <div class="output">
-      <h3>Output:</h3>
-      <pre>{{ output }}</pre>
+  <div class="w-full h-screen flex gap-4 p-4">
+    <!-- Code editor or input for commands -->
+    <textarea v-model="userInput"
+      class="w-full p-3 border rounded-lg border-gray-300 focus:ring-2 focus:ring-blue-500 focus:outline-none"
+      placeholder="Type a command (e.g., 'Add task', 'List tasks')"></textarea>
+
+    <!-- Output section -->
+    <div class="w-full mt-4 p-4 bg-gray-50 border rounded-lg">
+      <!-- Run button -->
+      <h3 class="text-lg font-semibold">Output:</h3>
+      <pre class="mt-2 text-sm text-gray-800">{{ output }}</pre>
+      <Button variant="primary" @click="handleInput"
+        class="w-full py-2 text-white bg-blue-600 rounded-md hover:bg-blue-700">
+        Run
+      </Button>
     </div>
   </div>
 </template>
 
 <script>
+import { Button } from '@/components/ui/button'
+
 export default {
   data() {
     return {
-      code: `package main\nimport "fmt"\nfunc main() {\n    fmt.Println("Hello, Go!")\n}`,
-      output: "",
+      userInput: "", // Store user input (task command)
+      output: "", // Output of Go code or task actions
     };
   },
   methods: {
-    async runCode() {
-      const result = await window.electronAPI.runGoCode(this.code);
-      this.output = result;
+    async handleInput() {
+      try {
+        // Send the input command to the Electron backend (IPC)
+        const result = await window.electronAPI.runGoCode(this.userInput);
+        this.output = result; // Display the result in the output area
+      } catch (error) {
+        console.error("Error executing Go code:", error);
+        this.output = "Error executing Go code";
+      }
     },
   },
 };
 </script>
-
-<style>
-.editor {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-textarea {
-  width: 100%;
-  height: 200px;
-}
-</style>
