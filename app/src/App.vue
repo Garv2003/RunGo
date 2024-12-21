@@ -8,9 +8,10 @@
     <!-- Output section -->
     <div class="w-full mt-4 p-4 bg-gray-50 border rounded-lg">
       <!-- Run button -->
+      <ThemeToggle />
       <h3 class="text-lg font-semibold">Output:</h3>
       <pre class="mt-2 text-sm text-gray-800">{{ output }}</pre>
-      <Button variant="primary" @click="handleInput"
+      <Button @click="handleInput"
         class="w-full py-2 text-white bg-blue-600 rounded-md hover:bg-blue-700">
         Run
       </Button>
@@ -18,27 +19,22 @@
   </div>
 </template>
 
-<script>
+<script setup lang="ts">
 import { Button } from '@/components/ui/button'
+import ThemeToggle from '@/components/custom/ThemeToggle.vue'
 
-export default {
-  data() {
-    return {
-      userInput: "", // Store user input (task command)
-      output: "", // Output of Go code or task actions
-    };
-  },
-  methods: {
-    async handleInput() {
-      try {
-        // Send the input command to the Electron backend (IPC)
-        const result = await window.electronAPI.runGoCode(this.userInput);
-        this.output = result; // Display the result in the output area
-      } catch (error) {
-        console.error("Error executing Go code:", error);
-        this.output = "Error executing Go code";
-      }
-    },
-  },
-};
+let output = "";
+let userInput = "";
+
+async function handleInput() {
+  try {
+    // Send the input command to the Electron backend (IPC)
+    const result = await window.electronAPI.runGoCode(userInput);
+    output = result; // Display the result in the output area
+  } catch (error) {
+    console.error("Error executing Go code:", error);
+    output = "Error executing Go code";
+  }
+}
+
 </script>
